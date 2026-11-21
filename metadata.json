@@ -1,0 +1,6 @@
+{
+  "name": "TRIANGLE MASTER – Chinh Phục Thế Giới Tam Giác",
+  "description": "Ứng dụng học tập Gamification môn Toán 7 (Bộ sách Kết nối tri thức với cuộc sống) – Chương IV: Tam giác bằng nhau.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

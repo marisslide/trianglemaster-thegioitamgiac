@@ -1,0 +1,313 @@
+import { Question } from '../../types';
+
+export const STAGE4_QUESTIONS: Question[] = [
+  {
+    id: 's4_q1',
+    stageId: 4,
+    questionType: 'multiple_choice',
+    difficulty: 'Nhận biết',
+    question: 'Quan sát ΔMNP vuông tại N (∠N = 90°). Cạnh nào là cạnh huyền của tam giác vuông này?',
+    options: ['Cạnh MN', 'Cạnh NP', 'Cạnh MP', 'Cạnh MN và NP'],
+    correctAnswer: 'Cạnh MP',
+    explanation:
+      'Trong tam giác vuông, cạnh huyền luôn là cạnh đối diện với góc vuông. Vì ΔMNP vuông tại N nên cạnh đối diện góc N là cạnh MP.',
+    hint: 'Tìm cạnh đối diện với góc có kí hiệu hình vuông nhỏ (góc 90°).',
+    keyKnowledge: 'Cạnh huyền luôn đối diện với góc vuông; hai cạnh tạo thành góc vuông là hai cạnh góc vuông.',
+    diagramData: {
+      viewBox: '0 0 360 190',
+      fills: [{ vertices: ['M', 'N', 'P'], fill: '#F5F3FF' }],
+      points: [
+        { id: 'N', label: 'N', x: 84, y: 156, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'M', label: 'M', x: 84, y: 38, labelOffset: { dx: -16, dy: -6 } },
+        { id: 'P', label: 'P', x: 282, y: 156, labelOffset: { dx: 16, dy: 8 } },
+      ],
+      segments: [
+        { from: 'M', to: 'N' },
+        { from: 'N', to: 'P' },
+        { from: 'M', to: 'P', highlight: true, color: '#8B5CF6' },
+      ],
+      angles: [{ vertex: 'N', from: 'P', to: 'M', isRightAngle: true, color: '#8B5CF6' }],
+    },
+    score: 10,
+    knowledgeTag: 'Nhận diện cạnh huyền và cạnh góc vuông',
+    mathCheck: { requiresRightAngleMarker: true },
+  },
+  {
+    id: 's4_q2',
+    stageId: 4,
+    questionType: 'multiple_choice',
+    difficulty: 'Nhận biết',
+    question: 'Trong ΔABC vuông tại A, góc nhọn nào kề với cạnh góc vuông AB?',
+    options: ['Góc A (∠BAC)', 'Góc B (∠ABC)', 'Góc C (∠ACB)', 'Cả góc B và góc C'],
+    correctAnswer: 'Góc B (∠ABC)',
+    explanation:
+      'Cạnh AB nối đỉnh A và đỉnh B. Vì ∠A = 90° là góc vuông nên góc nhọn kề với cạnh góc vuông AB chính là ∠B. Còn ∠C là góc nhọn đối diện với cạnh AB.',
+    hint: 'Cạnh AB có hai đầu mút là A (góc vuông) và B (góc nhọn).',
+    keyKnowledge: 'Trong ΔABC vuông tại A: ∠B là góc nhọn kề cạnh AB; ∠C là góc nhọn kề cạnh AC.',
+    diagramData: {
+      viewBox: '0 0 360 190',
+      fills: [{ vertices: ['A', 'B', 'C'], fill: '#F5F3FF' }],
+      points: [
+        { id: 'A', label: 'A', x: 86, y: 156, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'B', label: 'B', x: 86, y: 40, labelOffset: { dx: -16, dy: -6 } },
+        { id: 'C', label: 'C', x: 280, y: 156, labelOffset: { dx: 16, dy: 8 } },
+      ],
+      segments: [
+        { from: 'A', to: 'B', highlight: true, color: '#2563EB' },
+        { from: 'A', to: 'C' },
+        { from: 'B', to: 'C' },
+      ],
+      angles: [
+        { vertex: 'A', from: 'C', to: 'B', isRightAngle: true, color: '#8B5CF6' },
+        { vertex: 'B', from: 'A', to: 'C', arcs: 1, color: '#F97316', highlight: true },
+      ],
+    },
+    score: 10,
+    knowledgeTag: 'Góc nhọn kề cạnh góc vuông',
+    mathCheck: { requiresRightAngleMarker: true },
+  },
+  {
+    id: 's4_q3',
+    stageId: 4,
+    questionType: 'multiple_choice',
+    difficulty: 'Thông hiểu',
+    question:
+      'Cho ΔABC vuông tại A và ΔDEF vuông tại D có AB = DE và AC = DF. Hai tam giác vuông này bằng nhau theo trường hợp nào?',
+    options: [
+      'Hai cạnh góc vuông',
+      'Cạnh huyền – cạnh góc vuông',
+      'Cạnh huyền – góc nhọn',
+      'Cạnh góc vuông – góc nhọn kề',
+    ],
+    correctAnswer: 'Hai cạnh góc vuông',
+    explanation:
+      'Vì ΔABC vuông tại A và ΔDEF vuông tại D nên AB, AC và DE, DF đều là các cạnh góc vuông. Do đó ΔABC = ΔDEF theo trường hợp hai cạnh góc vuông (thực chất là c.g.c với góc vuông xen giữa).',
+    hint: 'Xác định xem AB, AC là cạnh góc vuông hay cạnh huyền của ΔABC vuông tại A.',
+    keyKnowledge: 'Hai cạnh góc vuông của tam giác vuông này bằng hai cạnh góc vuông tương ứng của tam giác vuông kia ⇒ hai tam giác bằng nhau.',
+    diagramData: {
+      viewBox: '0 0 460 190',
+      fills: [
+        { vertices: ['A', 'B', 'C'], fill: '#F5F3FF' },
+        { vertices: ['D', 'E', 'F'], fill: '#EFF6FF' },
+      ],
+      points: [
+        { id: 'A', label: 'A', x: 56, y: 156, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'B', label: 'B', x: 56, y: 42, labelOffset: { dx: -16, dy: -6 } },
+        { id: 'C', label: 'C', x: 196, y: 156, labelOffset: { dx: 16, dy: 8 } },
+        { id: 'D', label: 'D', x: 274, y: 156, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'E', label: 'E', x: 274, y: 42, labelOffset: { dx: -16, dy: -6 } },
+        { id: 'F', label: 'F', x: 414, y: 156, labelOffset: { dx: 16, dy: 8 } },
+      ],
+      segments: [
+        { from: 'A', to: 'B', ticks: 1, color: '#2563EB' },
+        { from: 'A', to: 'C', ticks: 2, color: '#14B8A6' },
+        { from: 'B', to: 'C' },
+        { from: 'D', to: 'E', ticks: 1, color: '#2563EB' },
+        { from: 'D', to: 'F', ticks: 2, color: '#14B8A6' },
+        { from: 'E', to: 'F' },
+      ],
+      angles: [
+        { vertex: 'A', from: 'C', to: 'B', isRightAngle: true, color: '#8B5CF6' },
+        { vertex: 'D', from: 'F', to: 'E', isRightAngle: true, color: '#8B5CF6' },
+      ],
+    },
+    score: 10,
+    knowledgeTag: 'Tam giác vuông – Hai cạnh góc vuông',
+    mathCheck: { requiresRightAngleMarker: true },
+  },
+  {
+    id: 's4_q4',
+    stageId: 4,
+    questionType: 'multiple_choice',
+    difficulty: 'Thông hiểu',
+    question:
+      'Cho ΔABC vuông tại A và ΔDEF vuông tại D có BC = EF và ∠B = ∠E. Hai tam giác vuông này bằng nhau theo trường hợp nào?',
+    options: [
+      'Cạnh huyền – góc nhọn',
+      'Cạnh góc vuông – góc nhọn kề',
+      'Cạnh huyền – cạnh góc vuông',
+      'Hai cạnh góc vuông',
+    ],
+    correctAnswer: 'Cạnh huyền – góc nhọn',
+    explanation:
+      'BC là cạnh huyền của ΔABC (đối diện ∠A = 90°), EF là cạnh huyền của ΔDEF (đối diện ∠D = 90°); ∠B và ∠E là hai góc nhọn tương ứng. Vậy ΔABC = ΔDEF theo trường hợp cạnh huyền – góc nhọn.',
+    hint: 'Xem BC và EF là cạnh huyền hay cạnh góc vuông.',
+    keyKnowledge: 'Cạnh huyền và một góc nhọn tương ứng bằng nhau ⇒ hai tam giác vuông bằng nhau.',
+    diagramData: {
+      viewBox: '0 0 460 190',
+      fills: [
+        { vertices: ['A', 'B', 'C'], fill: '#F5F3FF' },
+        { vertices: ['D', 'E', 'F'], fill: '#EFF6FF' },
+      ],
+      points: [
+        { id: 'A', label: 'A', x: 56, y: 156, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'B', label: 'B', x: 56, y: 42, labelOffset: { dx: -16, dy: -6 } },
+        { id: 'C', label: 'C', x: 196, y: 156, labelOffset: { dx: 16, dy: 8 } },
+        { id: 'D', label: 'D', x: 274, y: 156, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'E', label: 'E', x: 274, y: 42, labelOffset: { dx: -16, dy: -6 } },
+        { id: 'F', label: 'F', x: 414, y: 156, labelOffset: { dx: 16, dy: 8 } },
+      ],
+      segments: [
+        { from: 'A', to: 'B' },
+        { from: 'A', to: 'C' },
+        { from: 'B', to: 'C', ticks: 1, color: '#8B5CF6', highlight: true },
+        { from: 'D', to: 'E' },
+        { from: 'D', to: 'F' },
+        { from: 'E', to: 'F', ticks: 1, color: '#8B5CF6', highlight: true },
+      ],
+      angles: [
+        { vertex: 'A', from: 'C', to: 'B', isRightAngle: true, color: '#8B5CF6' },
+        { vertex: 'D', from: 'F', to: 'E', isRightAngle: true, color: '#8B5CF6' },
+        { vertex: 'B', from: 'A', to: 'C', arcs: 1, color: '#F97316' },
+        { vertex: 'E', from: 'D', to: 'F', arcs: 1, color: '#F97316' },
+      ],
+    },
+    score: 10,
+    knowledgeTag: 'Tam giác vuông – Cạnh huyền góc nhọn',
+    mathCheck: { requiresRightAngleMarker: true },
+  },
+  {
+    id: 's4_q5',
+    stageId: 4,
+    questionType: 'multiple_choice',
+    difficulty: 'Thông hiểu',
+    question:
+      'Cho ΔABC vuông tại A và ΔDEF vuông tại D có BC = EF và AC = DF. Hai tam giác vuông này bằng nhau theo trường hợp nào?',
+    options: [
+      'Hai cạnh góc vuông',
+      'Cạnh huyền – cạnh góc vuông',
+      'Cạnh huyền – góc nhọn',
+      'Cạnh góc vuông – góc nhọn kề',
+    ],
+    correctAnswer: 'Cạnh huyền – cạnh góc vuông',
+    explanation:
+      'Trong hai tam giác vuông đã cho: BC = EF là cặp cạnh huyền bằng nhau, còn AC = DF là cặp cạnh góc vuông tương ứng bằng nhau. Suy ra ΔABC = ΔDEF (cạnh huyền – cạnh góc vuông).',
+    hint: 'BC và EF là cạnh huyền; AC và DF là cạnh góc vuông.',
+    keyKnowledge: 'Trường hợp đặc biệt chỉ có ở tam giác vuông: Cạnh huyền – cạnh góc vuông.',
+    score: 10,
+    knowledgeTag: 'Tam giác vuông – Cạnh huyền cạnh góc vuông',
+  },
+  {
+    id: 's4_q6',
+    stageId: 4,
+    questionType: 'true_false',
+    difficulty: 'Thông hiểu',
+    question:
+      'Khẳng định sau Đúng hay Sai: "Cho ΔABC và ΔDEF (chưa biết chúng có phải tam giác vuông hay không) có BC = EF và AB = DE. Ta có thể kết luận ngay ΔABC = ΔDEF theo trường hợp cạnh huyền – cạnh góc vuông."',
+    options: ['Đúng', 'Sai'],
+    correctAnswer: 'Sai',
+    explanation:
+      'Các trường hợp bằng nhau của tam giác vuông CHỈ áp dụng khi đã xác định cả hai tam giác đều là tam giác vuông (có góc 90°). Nếu chưa có góc vuông thì 2 cặp cạnh chưa đủ để kết luận hai tam giác bằng nhau.',
+    hint: 'Điều kiện tiên quyết để dùng trường hợp "cạnh huyền – cạnh góc vuông" là gì?',
+    keyKnowledge: 'Luôn kiểm tra điều kiện ∠ = 90° ở cả hai tam giác trước khi dùng 4 trường hợp của tam giác vuông.',
+    score: 10,
+    knowledgeTag: 'Điều kiện áp dụng trường hợp tam giác vuông',
+  },
+  {
+    id: 's4_q7',
+    stageId: 4,
+    questionType: 'matching',
+    difficulty: 'Thông hiểu',
+    question:
+      'Cho ΔABC vuông tại A và ΔDEF vuông tại D. Ghép mỗi bộ dữ kiện sau với đúng trường hợp bằng nhau của hai tam giác vuông:',
+    matchingPairs: [
+      { id: 'r1', left: 'AB = DE và AC = DF', right: 'Hai cạnh góc vuông' },
+      { id: 'r2', left: 'AB = DE và ∠B = ∠E', right: 'Cạnh góc vuông – góc nhọn kề' },
+      { id: 'r3', left: 'BC = EF và ∠C = ∠F', right: 'Cạnh huyền – góc nhọn' },
+      { id: 'r4', left: 'BC = EF và AB = DE', right: 'Cạnh huyền – cạnh góc vuông' },
+    ],
+    correctAnswer: {
+      r1: 'Hai cạnh góc vuông',
+      r2: 'Cạnh góc vuông – góc nhọn kề',
+      r3: 'Cạnh huyền – góc nhọn',
+      r4: 'Cạnh huyền – cạnh góc vuông',
+    },
+    explanation:
+      'Trong ΔABC (vuông tại A) và ΔDEF (vuông tại D): AB, AC (DE, DF) là cạnh góc vuông; BC (EF) là cạnh huyền; ∠B kề cạnh AB và ∠E kề cạnh DE.',
+    hint: 'Phân biệt rõ cạnh huyền (BC, EF) với cạnh góc vuông (AB, AC, DE, DF) để ghép chính xác.',
+    keyKnowledge: '4 trường hợp bằng nhau của tam giác vuông: 2 cạnh góc vuông; CGV – góc nhọn kề; Cạnh huyền – góc nhọn; Cạnh huyền – CGV.',
+    score: 10,
+    knowledgeTag: 'Phân loại 4 trường hợp tam giác vuông',
+  },
+  {
+    id: 's4_q8',
+    stageId: 4,
+    questionType: 'multiple_choice',
+    difficulty: 'Vận dụng',
+    question:
+      'Cho ΔABC vuông tại A và ΔDEF vuông tại D có AB = DE và ∠C = ∠F. Bạn Hoa viết: "Vậy ΔABC = ΔDEF theo trường hợp cạnh góc vuông – góc nhọn kề." Nhận xét nào chính xác nhất?',
+    options: [
+      'Hoa nhầm vị trí góc nhọn kề: ∠C không kề cạnh AB; cần suy ra ∠B = ∠E (vì cùng phụ với ∠C, ∠F) rồi mới dùng cạnh góc vuông – góc nhọn kề',
+      'Lời giải của Hoa hoàn toàn chính xác vì ∠C là góc nhọn kề cạnh AB',
+      'Hai tam giác này không bằng nhau',
+      'Hoa chỉ cần đổi sang trường hợp cạnh huyền – góc nhọn là đúng',
+    ],
+    correctAnswer:
+      'Hoa nhầm vị trí góc nhọn kề: ∠C không kề cạnh AB; cần suy ra ∠B = ∠E (vì cùng phụ với ∠C, ∠F) rồi mới dùng cạnh góc vuông – góc nhọn kề',
+    explanation:
+      'Góc nhọn kề với cạnh góc vuông AB là ∠B (không phải ∠C). Tuy nhiên vì ∠B = 90° − ∠C và ∠E = 90° − ∠F mà ∠C = ∠F nên ta suy ra ∠B = ∠E, từ đó mới áp dụng đúng trường hợp cạnh góc vuông – góc nhọn kề.',
+    hint: 'Trong ΔABC vuông tại A, ∠C là góc đối diện hay góc kề của cạnh AB?',
+    keyKnowledge: 'Trong trường hợp "cạnh góc vuông – góc nhọn kề", góc nhọn PHẢI kề với cạnh góc vuông đang xét.',
+    score: 10,
+    knowledgeTag: 'Phát hiện lỗi sai trong tam giác vuông',
+  },
+  {
+    id: 's4_q9',
+    stageId: 4,
+    questionType: 'fill_blank',
+    difficulty: 'Vận dụng',
+    question:
+      'Cho ΔABC có AB = AC = 10 cm. Kẻ AH ⊥ BC (H thuộc BC), biết BH = 6 cm. Tính độ dài đoạn thẳng HC (đơn vị: cm).',
+    correctAnswer: 6,
+    unit: ' cm',
+    explanation:
+      'Xét hai tam giác vuông ΔAHB và ΔAHC (∠AHB = ∠AHC = 90°) có: cạnh huyền AB = AC = 10 cm và cạnh góc vuông AH chung. Suy ra ΔAHB = ΔAHC (cạnh huyền – cạnh góc vuông). Do đó HC = HB = 6 cm.',
+    hint: 'Chứng minh hai tam giác vuông ΔAHB và ΔAHC bằng nhau theo trường hợp cạnh huyền – cạnh góc vuông.',
+    keyKnowledge: 'Áp dụng trường hợp cạnh huyền – cạnh góc vuông để suy ra hai đoạn thẳng tương ứng bằng nhau.',
+    diagramData: {
+      viewBox: '0 0 360 195',
+      fills: [
+        { vertices: ['A', 'H', 'B'], fill: '#F5F3FF' },
+        { vertices: ['A', 'H', 'C'], fill: '#EFF6FF' },
+      ],
+      points: [
+        { id: 'A', label: 'A', x: 180, y: 32, labelOffset: { dx: 0, dy: -14 } },
+        { id: 'B', label: 'B', x: 76, y: 162, labelOffset: { dx: -16, dy: 8 } },
+        { id: 'C', label: 'C', x: 284, y: 162, labelOffset: { dx: 16, dy: 8 } },
+        { id: 'H', label: 'H', x: 180, y: 162, labelOffset: { dx: 0, dy: 18 } },
+      ],
+      segments: [
+        { from: 'A', to: 'B', ticks: 1, label: '10 cm', labelOffset: { dx: -32, dy: 0 }, color: '#8B5CF6' },
+        { from: 'A', to: 'C', ticks: 1, label: '10 cm', labelOffset: { dx: 34, dy: 0 }, color: '#8B5CF6' },
+        { from: 'B', to: 'H', label: '6 cm', labelOffset: { dx: 0, dy: 18 }, color: '#2563EB' },
+        { from: 'H', to: 'C', label: '?', labelOffset: { dx: 0, dy: 18 }, color: '#F97316' },
+        { from: 'A', to: 'H', highlight: true, color: '#14B8A6' },
+      ],
+      angles: [{ vertex: 'H', from: 'C', to: 'A', isRightAngle: true, color: '#14B8A6' }],
+    },
+    score: 10,
+    knowledgeTag: 'Vận dụng cạnh huyền – cạnh góc vuông',
+    mathCheck: { triangleSides: [[6, 8, 10]], requiresRightAngleMarker: true },
+  },
+  {
+    id: 's4_q10',
+    stageId: 4,
+    questionType: 'ordering',
+    difficulty: 'Vận dụng',
+    question:
+      'Cho tia Oz là tia phân giác của ∠xOy. Lấy điểm M thuộc tia Oz, kẻ MA ⊥ Ox (A ∈ Ox) và MB ⊥ Oy (B ∈ Oy). Sắp xếp các bước chứng minh MA = MB:',
+    orderingSteps: [
+      { id: 'v4', text: 'Suy ra ΔOMA = ΔOMB (cạnh huyền – góc nhọn), do đó MA = MB (hai cạnh tương ứng).' },
+      { id: 'v2', text: 'Xét hai tam giác vuông ΔOMA và ΔOMB, ta có OM là cạnh huyền chung.' },
+      { id: 'v1', text: 'Vì MA ⊥ Ox và MB ⊥ Oy nên ∠OAM = ∠OBM = 90° (ΔOMA và ΔOMB là hai tam giác vuông).' },
+      { id: 'v3', text: 'Ta có ∠AOM = ∠BOM (vì Oz là tia phân giác của ∠xOy).' },
+    ],
+    correctAnswer: ['v1', 'v2', 'v3', 'v4'],
+    explanation:
+      'Bước 1 bắt buộc chỉ ra hai tam giác vuông tại A và B. Bước 2–3 nêu đủ cạnh huyền chung OM và cặp góc nhọn bằng nhau ∠AOM = ∠BOM. Bước 4 kết luận theo cạnh huyền – góc nhọn rồi suy ra MA = MB.',
+    hint: 'Phải khẳng định góc vuông (90°) trước khi xét hai tam giác vuông!',
+    keyKnowledge: 'Khi chứng minh tam giác vuông bằng nhau, luôn chỉ rõ góc 90° ở bước đầu.',
+    score: 10,
+    knowledgeTag: 'Chứng minh hai tam giác vuông bằng nhau',
+  },
+];
