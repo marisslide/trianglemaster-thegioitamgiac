@@ -23,6 +23,7 @@ import { JourneyMap } from './components/JourneyMap';
 import { StagePage } from './components/StagePage';
 import { StudentProfile } from './components/StudentProfile';
 import { ReviewPage } from './components/ReviewPage';
+import { ErrorDiagnosisLab } from './components/ErrorDiagnosisLab';
 import { TeacherDashboard } from './components/TeacherDashboard';
 
 export default function App() {
@@ -76,7 +77,12 @@ export default function App() {
     [settings.googleSheetsUrl]
   );
 
-  const handleLoginNew = (fullName: string, className: string, schoolName: string) => {
+  const handleLoginNew = (
+    fullName: string,
+    className: string,
+    schoolName: string,
+    teamName?: string
+  ) => {
     // Check if same student (same name & class) already exists so they keep progress
     const existing = students.find(
       (s) =>
@@ -88,6 +94,7 @@ export default function App() {
       const refreshed: StudentRecord = {
         ...existing,
         schoolName: schoolName || existing.schoolName,
+        teamName: teamName || existing.teamName,
         lastActiveAt: new Date().toISOString(),
       };
       setStudents((prev) => upsertStudent(prev, refreshed));
@@ -97,7 +104,7 @@ export default function App() {
       return;
     }
 
-    const created = createNewStudent(fullName, className, schoolName);
+    const created = createNewStudent(fullName, className, schoolName, teamName);
     setStudents((prev) => upsertStudent(prev, created));
     setActiveStudentId(created.id);
     saveActiveStudentId(created.id);
@@ -137,7 +144,14 @@ export default function App() {
   };
 
   const handleNavigate = (view: AppView) => {
-    if ((view === 'map' || view === 'profile' || view === 'review' || view === 'stage') && !activeStudent) {
+    if (
+      (view === 'map' ||
+        view === 'profile' ||
+        view === 'review' ||
+        view === 'stage' ||
+        view === 'error_lab') &&
+      !activeStudent
+    ) {
       setCurrentView('login');
       return;
     }
@@ -172,6 +186,7 @@ export default function App() {
             onSelectStage={handleSelectStage}
             onOpenProfile={() => setCurrentView('profile')}
             onOpenReview={() => setCurrentView('review')}
+            onOpenErrorLab={() => setCurrentView('error_lab')}
           />
         )}
 
@@ -193,9 +208,20 @@ export default function App() {
         {currentView === 'profile' && activeStudent && (
           <StudentProfile
             student={activeStudent}
+            allStudents={students}
             settings={settings}
             onSelectStage={handleSelectStage}
             onOpenReview={() => setCurrentView('review')}
+            onOpenErrorLab={() => setCurrentView('error_lab')}
+            onUpdateStudent={handleUpdateStudent}
+          />
+        )}
+
+        {currentView === 'error_lab' && activeStudent && (
+          <ErrorDiagnosisLab
+            student={activeStudent}
+            onUpdateStudent={handleUpdateStudent}
+            onBackToMap={() => setCurrentView('map')}
           />
         )}
 

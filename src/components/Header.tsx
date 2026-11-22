@@ -3,7 +3,7 @@ import { LogOut, Menu, X } from 'lucide-react';
 import { StudentRecord } from '../types';
 import { TriangleLogo } from './TriangleLogo';
 
-export type AppView = 'login' | 'map' | 'stage' | 'profile' | 'review' | 'teacher';
+export type AppView = 'login' | 'map' | 'stage' | 'error_lab' | 'profile' | 'review' | 'teacher';
 
 interface HeaderProps {
   currentView: AppView;
@@ -22,8 +22,9 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems: { id: AppView; label: string; requiresStudent?: boolean }[] = [
     { id: 'map', label: 'Bản đồ 6 chặng', requiresStudent: true },
-    { id: 'profile', label: 'Hồ sơ chinh phục', requiresStudent: true },
+    { id: 'error_lab', label: 'Chẩn đoán lỗi sai', requiresStudent: true },
     { id: 'review', label: 'Ôn tập bài sai', requiresStudent: true },
+    { id: 'profile', label: 'Hồ sơ & Thi đua', requiresStudent: true },
     { id: 'teacher', label: 'Giáo viên', requiresStudent: false },
   ];
 

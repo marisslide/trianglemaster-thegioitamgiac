@@ -111,7 +111,8 @@ export function upsertStudent(
 export function createNewStudent(
   fullName: string,
   className: string,
-  schoolName: string
+  schoolName: string,
+  teamName?: string
 ): StudentRecord {
   const now = new Date().toISOString();
   return {
@@ -119,6 +120,7 @@ export function createNewStudent(
     fullName: fullName.trim(),
     className: className.trim(),
     schoolName: schoolName.trim(),
+    teamName: teamName ? teamName.trim() : undefined,
     createdAt: now,
     lastActiveAt: now,
     totalPoints: 0,
@@ -127,6 +129,7 @@ export function createNewStudent(
     questionAttempts: {},
     stageProgress: createEmptyStageProgress(),
     earnedBadgeIds: [],
+    completedErrorCaseIds: [],
     sessions: [],
   };
 }

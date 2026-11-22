@@ -16,12 +16,17 @@ import {
   Copy,
   Download,
   FileJson,
+  Flame,
+  GraduationCap,
+  Lightbulb,
   Printer,
   RefreshCw,
   Search,
   Settings,
   ShieldCheck,
+  TrendingUp,
   Unlock,
+  UserCheck,
   Users,
   X,
 } from 'lucide-react';
@@ -46,7 +51,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   settings,
   onUpdateSettings,
 }) => {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'settings' | 'sheets'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'pedagogy' | 'settings' | 'sheets'>('analytics');
   const [searchTerm, setSearchTerm] = useState('');
   const [classFilter, setClassFilter] = useState('all');
   const [stageFilter, setStageFilter] = useState<number>(0);
@@ -156,6 +161,102 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
       .sort((a, b) => b.wrongCount - a.wrongCount || b.errorRate - a.errorRate)
       .slice(0, 4);
   }, [computedRows, stageFilter]);
+
+  // Pedagogical Differentiation & Action Plans (SKKN Measure 4)
+  const pedagogicalAnalysis = useMemo(() => {
+    const basicNeedGroup: {
+      student: StudentRecord;
+      accuracy: number;
+      weakTags: string[];
+      totalAnswered: number;
+    }[] = [];
+    const advancedGroup: {
+      student: StudentRecord;
+      accuracy: number;
+      completedStages: number;
+      totalPoints: number;
+    }[] = [];
+
+    computedRows.forEach((r) => {
+      if (r.answered === 0) return;
+      if (r.accuracy < 70) {
+        basicNeedGroup.push({
+          student: r.student,
+          accuracy: r.accuracy,
+          weakTags: r.weakTopics.slice(0, 3).map((w) => w.tag),
+          totalAnswered: r.answered,
+        });
+      } else {
+        advancedGroup.push({
+          student: r.student,
+          accuracy: r.accuracy,
+          completedStages: r.completedStages,
+          totalPoints: r.totalPoints,
+        });
+      }
+    });
+
+    // Improvement progress comparing first attempt vs latest attempt
+    const progressComparison = students
+      .filter((s) => s.sessions && s.sessions.length >= 2)
+      .map((s) => {
+        const chronological = [...s.sessions].sort(
+          (a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
+        );
+        const first = chronological[0];
+        const latest = chronological[chronological.length - 1];
+        const delta = latest.accuracyPercent - first.accuracyPercent;
+        return {
+          student: s,
+          firstAccuracy: first.accuracyPercent,
+          latestAccuracy: latest.accuracyPercent,
+          delta,
+          totalSessions: s.sessions.length,
+          lastPlayedAt: latest.completedAt,
+        };
+      })
+      .sort((a, b) => b.delta - a.delta);
+
+    // Group / Team competition overview
+    const teamMap = new Map<
+      string,
+      { teamName: string; count: number; totalScore: number; accuracies: number[] }
+    >();
+    students.forEach((s) => {
+      const team = s.teamName || 'Chưa vào đội';
+      if (!teamMap.has(team)) {
+        teamMap.set(team, { teamName: team, count: 0, totalScore: 0, accuracies: [] });
+      }
+      const item = teamMap.get(team)!;
+      item.count += 1;
+      item.totalScore += s.totalPoints;
+      const stats = computeStudentStats(s);
+      if (stats.totalAnswered > 0) {
+        item.accuracies.push(stats.accuracy);
+      }
+    });
+
+    const teamList = Array.from(teamMap.values())
+      .map((t) => {
+        const avgAcc =
+          t.accuracies.length > 0
+            ? Math.round(t.accuracies.reduce((a, b) => a + b, 0) / t.accuracies.length)
+            : 0;
+        return {
+          ...t,
+          avgAccuracy: avgAcc,
+          avgScore: t.count > 0 ? Math.round(t.totalScore / t.count) : 0,
+        };
+      })
+      .sort((a, b) => b.totalScore - a.totalScore);
+
+    return {
+      basicNeedGroup: basicNeedGroup.sort((a, b) => a.accuracy - b.accuracy),
+      advancedGroup: advancedGroup.sort((a, b) => b.accuracy - a.accuracy),
+      progressComparison,
+      teamList,
+    };
+  }, [computedRows, students]);
 
   // Export UTF-8 BOM CSV compatible with Excel Vietnamese
   const handleExportCSV = () => {
@@ -328,6 +429,18 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
           >
             <Users className="w-4 h-4" />
             Thống kê & Báo cáo
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('pedagogy')}
+            className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap transition-colors ${
+              activeTab === 'pedagogy'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Lightbulb className="w-4 h-4 text-amber-500" />
+            Phân tích sư phạm & Đề xuất dạy học
           </button>
           <button
             type="button"
@@ -892,6 +1005,370 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               <pre className="p-4 bg-slate-950 text-slate-100 text-xs font-mono overflow-x-auto flex-1 max-h-[520px] leading-relaxed">
                 {GOOGLE_APPS_SCRIPT_CODE}
               </pre>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: PEDAGOGICAL ANALYSIS & TEACHING PROPOSALS (SKKN Measure 4) */}
+      {activeTab === 'pedagogy' && (
+        <div className="space-y-6">
+          {/* Header Overview Card */}
+          <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white space-y-3 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-800/80 text-amber-300 text-xs font-bold uppercase tracking-wider">
+              <Lightbulb className="w-4 h-4" />
+              Sáng kiến kinh nghiệm hình học 7
+            </div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold">
+              Phân tích sư phạm & Đề xuất điều chỉnh dạy học
+            </h2>
+            <p className="text-sm text-blue-100 max-w-3xl leading-relaxed">
+              Dựa trên dữ liệu học tập thực tế của học sinh trên ứng dụng, hệ thống tự động phân loại đối tượng học sinh, phát hiện các ngộ nhận toán học điển hình và đề xuất kế hoạch can thiệp sư phạm phù hợp.
+            </p>
+          </div>
+
+          {/* Section 1: Two-Tier Student Differentiation */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Group 1: Basic Support Needed */}
+            <div className="bg-white rounded-3xl border-2 border-rose-200 p-6 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center font-extrabold text-lg">
+                    ⚠️
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg font-extrabold text-slate-900">
+                      Nhóm cần củng cố kiến thức cơ bản
+                    </h3>
+                    <p className="text-xs text-rose-700 font-semibold">
+                      Độ chính xác &lt; 70% ({pedagogicalAnalysis.basicNeedGroup.length} học sinh)
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200">
+                  Cần phụ đạo
+                </span>
+              </div>
+
+              <div className="rounded-xl bg-rose-50/60 p-4 border border-rose-100 text-xs text-rose-950 space-y-2">
+                <div className="font-bold flex items-center gap-1.5 text-rose-900">
+                  <ShieldCheck className="w-4 h-4 text-rose-600" />
+                  Định hướng sư phạm của giáo viên:
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-slate-700">
+                  <li>Yêu cầu học sinh mở <strong>Phòng chẩn đoán lỗi sai</strong> để thực hiện các ca sửa sai trực quan.</li>
+                  <li>Ôn lại các yếu tố tương ứng trong Chặng 1 & 2 trước khi chuyển sang chứng minh hình.</li>
+                  <li>Phân công bạn học kèm theo mô hình đôi bạn cùng tiến trong tổ.</li>
+                </ul>
+              </div>
+
+              {pedagogicalAnalysis.basicNeedGroup.length === 0 ? (
+                <div className="p-4 rounded-xl bg-slate-50 text-center text-xs text-slate-500">
+                  Không có học sinh nào dưới 70%. Cả lớp đều nắm vững chuẩn kiến thức!
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                  {pedagogicalAnalysis.basicNeedGroup.map((item) => (
+                    <div
+                      key={item.student.id}
+                      onClick={() => setSelectedStudent(item.student)}
+                      className="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 bg-white cursor-pointer transition-all flex items-center justify-between gap-3"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-900 text-sm">
+                          {item.student.fullName}
+                        </div>
+                        <div className="text-xs text-slate-500 flex flex-wrap gap-1 mt-1">
+                          Lớp {item.student.className} ·{' '}
+                          <span className="text-rose-600 font-medium">
+                            Yếu: {item.weakTags.join(', ') || 'Cần luyện thêm'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-display font-extrabold text-base text-rose-600 tabular-nums">
+                          {item.accuracy}%
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {item.totalAnswered} câu đã làm
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Group 2: Advanced Enrichment */}
+            <div className="bg-white rounded-3xl border-2 border-emerald-200 p-6 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-extrabold text-lg">
+                    🌟
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg font-extrabold text-slate-900">
+                      Nhóm rèn luyện nâng cao & vận dụng
+                    </h3>
+                    <p className="text-xs text-emerald-700 font-semibold">
+                      Độ chính xác ≥ 70% ({pedagogicalAnalysis.advancedGroup.length} học sinh)
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                  Bồi dưỡng HS khá giỏi
+                </span>
+              </div>
+
+              <div className="rounded-xl bg-emerald-50/60 p-4 border border-emerald-100 text-xs text-emerald-950 space-y-2">
+                <div className="font-bold flex items-center gap-1.5 text-emerald-900">
+                  <GraduationCap className="w-4 h-4 text-emerald-600" />
+                  Định hướng sư phạm của giáo viên:
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-slate-700">
+                  <li>Khuyến khích học sinh chinh phục <strong>Chặng 6 – Đấu trường Triangle Master</strong> để đạt danh hiệu Đại Kiện Tướng.</li>
+                  <li>Giao thêm bài tập chứng minh song song và tính số đo góc bằng phương pháp dựng tam giác phụ.</li>
+                  <li>Bầu làm Nhóm trưởng phụ trách hướng dẫn các thành viên trong đội thi đua.</li>
+                </ul>
+              </div>
+
+              {pedagogicalAnalysis.advancedGroup.length === 0 ? (
+                <div className="p-4 rounded-xl bg-slate-50 text-center text-xs text-slate-500">
+                  Chưa có học sinh nào hoàn thành bài với độ chính xác ≥ 70%.
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                  {pedagogicalAnalysis.advancedGroup.map((item) => (
+                    <div
+                      key={item.student.id}
+                      onClick={() => setSelectedStudent(item.student)}
+                      className="p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 bg-white cursor-pointer transition-all flex items-center justify-between gap-3"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-900 text-sm">
+                          {item.student.fullName}
+                        </div>
+                        <div className="text-xs text-slate-500 flex flex-wrap gap-1 mt-1">
+                          Lớp {item.student.className} · {item.completedStages}/6 chặng hoàn thành
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-display font-extrabold text-base text-emerald-600 tabular-nums">
+                          {item.accuracy}%
+                        </div>
+                        <div className="text-[11px] text-amber-600 font-bold">
+                          {item.totalPoints} điểm
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section 2: Progress Tracking Across Attempts */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-display text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  Theo dõi tiến bộ qua các lần luyện tập của học sinh
+                </h3>
+                <p className="text-xs text-slate-500">
+                  So sánh tỉ lệ chính xác giữa lần thực hiện đầu tiên và lần luyện tập gần nhất
+                </p>
+              </div>
+            </div>
+
+            {pedagogicalAnalysis.progressComparison.length === 0 ? (
+              <div className="rounded-2xl bg-slate-50 border border-dashed border-slate-300 p-6 text-center text-xs text-slate-500">
+                Chưa có học sinh nào thực hiện từ 2 lượt luyện tập trở lên để so sánh tiến độ.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600">
+                      <th className="py-3 px-4">Học sinh</th>
+                      <th className="py-3 px-4">Lớp</th>
+                      <th className="py-3 px-4 text-center">Số lượt làm</th>
+                      <th className="py-3 px-4 text-right">Lượt đầu</th>
+                      <th className="py-3 px-4 text-right">Lượt gần nhất</th>
+                      <th className="py-3 px-4 text-right">Mức độ tiến bộ</th>
+                      <th className="py-3 px-4">Đánh giá tiến bộ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {pedagogicalAnalysis.progressComparison.map((row) => (
+                      <tr key={row.student.id} className="hover:bg-slate-50/70">
+                        <td className="py-3 px-4 font-bold text-slate-900">{row.student.fullName}</td>
+                        <td className="py-3 px-4 text-xs text-slate-600">{row.student.className}</td>
+                        <td className="py-3 px-4 text-center font-mono text-xs">{row.totalSessions} lượt</td>
+                        <td className="py-3 px-4 text-right font-mono tabular-nums text-slate-600">
+                          {row.firstAccuracy}%
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono tabular-nums font-bold text-blue-700">
+                          {row.latestAccuracy}%
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono tabular-nums font-extrabold">
+                          {row.delta > 0 ? (
+                            <span className="text-emerald-600">+{row.delta}%</span>
+                          ) : row.delta < 0 ? (
+                            <span className="text-rose-600">{row.delta}%</span>
+                          ) : (
+                            <span className="text-slate-500">0%</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-xs">
+                          {row.delta >= 20 ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">
+                              🚀 Tiến bộ vượt bậc
+                            </span>
+                          ) : row.delta > 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-semibold text-[11px]">
+                              📈 Có tiến bộ
+                            </span>
+                          ) : row.delta === 0 ? (
+                            <span className="text-slate-500 text-[11px]">Duy trì ổn định</span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-semibold text-[11px]">
+                              ⚠️ Cần chú ý thêm
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Section 3: Remedial Action Plan for Top Erroneous Topics */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-sm">
+            <div>
+              <h3 className="font-display text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+                Kế hoạch can thiệp & Chữa lỗi chung toàn lớp (15 phút đầu giờ)
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Đề xuất các hoạt động sư phạm cụ thể cho giáo viên ứng với những chủ đề học sinh mắc lỗi nhiều nhất
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-2xl border border-slate-200 p-5 bg-slate-50/50 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 text-sm">
+                    Lỗi 1: Xác định góc xen giữa trong trường hợp c.g.c
+                  </span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800">
+                    Phổ biến
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  <strong>Nguyên nhân học sinh mắc phải:</strong> Nhìn thấy có 2 cạnh bằng nhau và 1 góc bằng nhau là vội vàng kết luận c.g.c mà không kiểm tra xem góc đó có nằm giữa 2 cạnh hay không.
+                </p>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-blue-900 space-y-1">
+                  <strong>Giải pháp can thiệp của GV:</strong>
+                  <div>Vẽ hình hai tam giác lên bảng, cho học sinh dùng phấn màu tô viền 2 cạnh, sau đó dùng ngón tay chỉ vào điểm chung của hai cạnh để khẳng định đó mới là góc xen giữa.</div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 p-5 bg-slate-50/50 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 text-sm">
+                    Lỗi 2: Nhầm lẫn trường hợp c.c.c và c.g.c
+                  </span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                    Trọng tâm SKKN
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  <strong>Nguyên nhân học sinh mắc phải:</strong> Đề bài cho 2 cạnh và 1 góc (AB = DE, BC = EF, ∠B = ∠E) nhưng lại kết luận bằng nhau theo trường hợp c.c.c.
+                </p>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-blue-900 space-y-1">
+                  <strong>Giải pháp can thiệp của GV:</strong>
+                  <div>Yêu cầu học sinh vào <em>Phòng chẩn đoán lỗi sai</em> làm Ca chẩn đoán số 1; giải thích rõ c.c.c cần đủ 3 cạnh, nếu chỉ có 2 cạnh và 1 góc xen giữa thì bắt buộc phải là c.g.c.</div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 p-5 bg-slate-50/50 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 text-sm">
+                    Lỗi 3: Áp dụng trường hợp tam giác vuông khi chưa có góc vuông
+                  </span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                    Cẩn trọng
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  <strong>Nguyên nhân học sinh mắc phải:</strong> Quên kiểm tra điều kiện ∠ = 90° trước khi áp dụng trường hợp "cạnh huyền - cạnh góc vuông".
+                </p>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-blue-900 space-y-1">
+                  <strong>Giải pháp can thiệp của GV:</strong>
+                  <div>Nhấn mạnh quy tắc: "Phải vuông thì mới có huyền". Yêu cầu học sinh chỉ ra góc vuông trước khi xét cặp cạnh huyền.</div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 p-5 bg-slate-50/50 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 text-sm">
+                    Lỗi 4: Thứ tự các đỉnh tương ứng trong kí hiệu hai tam giác
+                  </span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-teal-100 text-teal-800">
+                    Kỹ năng cơ bản
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  <strong>Nguyên nhân học sinh mắc phải:</strong> Viết kí hiệu tự do mà không ghép đúng đỉnh tương ứng, dẫn tới suy ra cặp cạnh và góc tương ứng bị sai lệch.
+                </p>
+                <div className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-blue-900 space-y-1">
+                  <strong>Giải pháp can thiệp của GV:</strong>
+                  <div>Luyện tập kỹ thuật "đối chiếu vạch": Cạnh 1 vạch đối diện đỉnh nào thì đỉnh đó tương ứng với đỉnh đối diện cạnh 1 vạch của tam giác kia.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Class Team Competition Status */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-sm">
+            <div>
+              <h3 className="font-display text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                <Flame className="w-5 h-5 text-amber-500" />
+                Tổng hợp tình hình thi đua Đội / Nhóm của lớp
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Theo dõi kết quả học tập hợp tác và tinh thần thi đua giữa các tổ/nhóm trong lớp
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {pedagogicalAnalysis.teamList.map((team, idx) => (
+                <div
+                  key={team.teamName}
+                  className="rounded-2xl border border-slate-200 p-4 bg-slate-50/60 space-y-2 hover:border-slate-300 transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-800">
+                      Hạng #{idx + 1}
+                    </span>
+                    <span className="text-xs text-slate-500">{team.count} học sinh</span>
+                  </div>
+                  <h4 className="font-display font-extrabold text-base text-slate-900">
+                    {team.teamName}
+                  </h4>
+                  <div className="pt-1 flex items-center justify-between text-xs border-t border-slate-200/80">
+                    <span className="text-slate-500">Tổng điểm:</span>
+                    <span className="font-bold text-blue-700 font-mono">{team.totalScore}đ</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500">Độ chính xác TB:</span>
+                    <span className="font-bold text-teal-700 font-mono">{team.avgAccuracy}%</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

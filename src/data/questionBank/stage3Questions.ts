@@ -36,13 +36,13 @@ export const STAGE3_QUESTIONS: Question[] = [
     stageId: 3,
     questionType: 'multiple_choice',
     difficulty: 'Thông hiểu',
-    question: 'Quan sát hai tam giác ΔABC và ΔDEF có AB = DE, AC = DF và ∠A = ∠D. Hai tam giác bằng nhau theo trường hợp nào?',
+    question: 'Cho tam giác ABC và DEF có AB = DE, AC = DF và góc BAC = góc EDF. Hai tam giác bằng nhau theo trường hợp nào?',
     options: ['c.c.c', 'c.g.c', 'g.c.g', 'Không đủ điều kiện'],
     correctAnswer: 'c.g.c',
     explanation:
-      '∠A xen giữa hai cạnh AB, AC và ∠D xen giữa hai cạnh DE, DF. Vì AB = DE, ∠A = ∠D, AC = DF nên ΔABC = ΔDEF theo trường hợp c.g.c.',
+      'Góc BAC xen giữa hai cạnh AB, AC và góc EDF xen giữa hai cạnh DE, DF. Vì AB = DE, ∠BAC = ∠EDF, AC = DF nên ΔABC = ΔDEF theo trường hợp cạnh – góc – cạnh (c.g.c).',
     hint: 'Kiểm tra xem góc bằng nhau có nằm ngay giữa hai cặp cạnh bằng nhau không.',
-    keyKnowledge: 'c.g.c: Hai cạnh và góc XEN GIỮA tương ứng bằng nhau.',
+    keyKnowledge: 'Trường hợp c.g.c: Hai cạnh và góc XEN GIỮA của tam giác này bằng hai cạnh và góc xen giữa của tam giác kia.',
     diagramData: {
       viewBox: '0 0 460 190',
       fills: [

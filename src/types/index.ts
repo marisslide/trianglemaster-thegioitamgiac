@@ -179,11 +179,30 @@ export interface StageProgressData {
   lastPlayedAt?: string;
 }
 
+export interface ErrorDiagnosisCase {
+  id: string;
+  stageId: number;
+  stageCode: string;
+  title: string;
+  topic: string;
+  problem: string;
+  diagramData?: DiagramData;
+  solutionSteps: { stepNum: number; title: string; content: string }[];
+  wrongStepNum: number;
+  wrongReasonOptions: string[];
+  correctReason: string;
+  correctionOptions: string[];
+  correctCorrection: string;
+  correctedSolution: string[];
+  lessonLearned: string;
+}
+
 export interface StudentRecord {
   id: string;
   fullName: string;
   className: string;
   schoolName: string;
+  teamName?: string; // Tên đội/nhóm thi đua (e.g. Đội Tam giác đều, Đội Tam giác vuông...)
   createdAt: string;
   lastActiveAt: string;
   totalPoints: number;
@@ -194,6 +213,7 @@ export interface StudentRecord {
   questionAttempts: Record<string, QuestionAttempt>;
   stageProgress: Record<number, StageProgressData>;
   earnedBadgeIds: string[];
+  completedErrorCaseIds?: string[]; // IDs của các tình huống sai lầm đã sửa đúng
   sessions: SessionRecord[];
   certificateIssuedAt?: string;
 }

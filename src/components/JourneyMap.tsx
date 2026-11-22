@@ -3,6 +3,7 @@ import {
   Award,
   CheckCircle2,
   ChevronRight,
+  FileSearch,
   Lock,
   PlayCircle,
   Star,
@@ -19,6 +20,7 @@ interface JourneyMapProps {
   onSelectStage: (stageId: number) => void;
   onOpenProfile: () => void;
   onOpenReview: () => void;
+  onOpenErrorLab: () => void;
 }
 
 const STATUS_META: Record<
@@ -51,6 +53,7 @@ export const JourneyMap: React.FC<JourneyMapProps> = ({
   onSelectStage,
   onOpenProfile,
   onOpenReview,
+  onOpenErrorLab,
 }) => {
   const [heroError, setHeroError] = useState(false);
   const [mascotError, setMascotError] = useState(false);
@@ -210,6 +213,46 @@ export const JourneyMap: React.FC<JourneyMapProps> = ({
           </button>
         </div>
       )}
+
+      {/* Feature Card: Phòng Chẩn đoán & Sửa lỗi sai hình học (Biện pháp 3 SKKN) */}
+      <section className="rounded-3xl border-2 border-indigo-200 bg-gradient-to-r from-indigo-50/90 via-blue-50/60 to-white p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+            <FileSearch className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <div className="text-xs font-bold uppercase tracking-wider text-indigo-700 flex items-center gap-2">
+              <span>Biện pháp 3 SKKN: Phát hiện & Sửa lỗi sai</span>
+              <span className="text-amber-800 font-extrabold bg-amber-100 border border-amber-200 px-2 py-0.5 rounded text-[11px]">
+                +20 điểm/hồ sơ
+              </span>
+            </div>
+            <h3 className="font-display text-lg sm:text-xl font-extrabold text-slate-900">
+              Phòng Chẩn đoán & Sửa lỗi sai hình học
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
+              Trở thành "Thám tử hình học": Soi chiếu từng bước giải mẫu, bóc tách cạm bẫy ngộ nhận (nhầm góc xen giữa c.g.c, nhầm cạnh huyền – cạnh góc vuông, ngộ nhận tam giác cân...) và tự tay hoàn thiện lời giải chuẩn xác.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="text-right hidden sm:block">
+            <div className="text-xs font-semibold text-slate-500">Đã chẩn đoán</div>
+            <div className="font-display text-lg font-extrabold text-indigo-700 tabular-nums">
+              {(student.completedErrorCaseIds || []).length} / 7 hồ sơ
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenErrorLab}
+            className="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm whitespace-nowrap shadow-sm transition-colors flex items-center gap-2"
+          >
+            <span>Vào chẩn đoán ngay</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </section>
 
       {/* 6-Stage Adventure Journey Map */}
       <section className="space-y-5">

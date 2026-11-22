@@ -5,7 +5,7 @@ import { TriangleLogo } from './TriangleLogo';
 
 interface HomePageProps {
   existingStudents: StudentRecord[];
-  onLoginNew: (fullName: string, className: string, schoolName: string) => void;
+  onLoginNew: (fullName: string, className: string, schoolName: string, teamName?: string) => void;
   onResumeStudent: (studentId: string) => void;
   onOpenTeacherDashboard: () => void;
 }
@@ -19,6 +19,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [fullName, setFullName] = useState('');
   const [className, setClassName] = useState('');
   const [schoolName, setSchoolName] = useState('');
+  const [teamName, setTeamName] = useState('Đội Tam giác đều');
   const [error, setError] = useState('');
   const [mascotError, setMascotError] = useState(false);
 
@@ -33,7 +34,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       return;
     }
     setError('');
-    onLoginNew(fullName.trim(), className.trim(), schoolName.trim());
+    onLoginNew(fullName.trim(), className.trim(), schoolName.trim(), teamName);
   };
 
   return (
@@ -166,6 +167,27 @@ export const HomePage: React.FC<HomePageProps> = ({
                     placeholder="Ví dụ: THCS Chu Văn An"
                     className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 font-medium focus:border-blue-600 focus:ring-4 focus:ring-blue-600/15 outline-none transition-all"
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="stu_team" className="block text-sm font-semibold text-slate-800">
+                    Đội / Nhóm thi đua <span className="text-slate-400 font-normal">(phục vụ thi đua nhóm)</span>
+                  </label>
+                  <select
+                    id="stu_team"
+                    value={teamName}
+                    onChange={(e) => setTeamName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 font-medium focus:border-blue-600 focus:ring-4 focus:ring-blue-600/15 outline-none transition-all bg-white"
+                  >
+                    <option value="Đội Tam giác đều">Đội Tam giác đều (3 cạnh bằng nhau, 3 góc 60°)</option>
+                    <option value="Đội Tam giác vuông">Đội Tam giác vuông (Cạnh huyền – Cạnh góc vuông)</option>
+                    <option value="Đội Tam giác cân">Đội Tam giác cân (Hai góc ở đáy bằng nhau)</option>
+                    <option value="Đội Đường trung trực">Đội Đường trung trực (Cách đều hai đầu mút)</option>
+                    <option value="Nhóm 1">Nhóm 1</option>
+                    <option value="Nhóm 2">Nhóm 2</option>
+                    <option value="Nhóm 3">Nhóm 3</option>
+                    <option value="Nhóm 4">Nhóm 4</option>
+                  </select>
                 </div>
 
                 {error && (

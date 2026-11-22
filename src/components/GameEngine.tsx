@@ -87,9 +87,19 @@ export const GameEngine: React.FC<GameEngineProps> = ({
     [stage.id]
   );
 
+  const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'Nhận biết' | 'Thông hiểu' | 'Vận dụng'>('all');
+  const [customQuestionSubset, setCustomQuestionSubset] = useState<Question[] | null>(null);
+
+  const activeQuestions = useMemo(() => {
+    if (customQuestionSubset) return customQuestionSubset;
+    if (mode !== 'practice' || difficultyFilter === 'all') return questions;
+    const filtered = questions.filter((q) => q.difficulty === difficultyFilter);
+    return filtered.length > 0 ? filtered : questions;
+  }, [customQuestionSubset, difficultyFilter, mode, questions]);
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answerValue, setAnswerValue] = useState<QuestionAnswerValue>(() =>
-    questions[0] ? createInitialAnswer(questions[0]) : ''
+    activeQuestions[0] ? createInitialAnswer(activeQuestions[0]) : ''
   );
   const [feedback, setFeedback] = useState<TurnFeedback | null>(null);
   const [showHint, setShowHint] = useState(false);
@@ -115,7 +125,7 @@ export const GameEngine: React.FC<GameEngineProps> = ({
   const studentRef = useRef<StudentRecord>(student);
   studentRef.current = student;
 
-  const currentQuestion = questions[currentIdx];
+  const currentQuestion = activeQuestions[currentIdx];
 
   // Reset answer state when advancing question
   useEffect(() => {
@@ -131,7 +141,7 @@ export const GameEngine: React.FC<GameEngineProps> = ({
       if (isFinished) return;
       const nowIso = new Date().toISOString();
       const durationSec = Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000));
-      const totalQ = questions.length;
+      const totalQ = activeQuestions.length;
       const finalCorrect = finalCorrectOverride ?? sessionCorrect;
       const baseSessionPoints = finalPointsOverride ?? sessionPoints;
       const accuracy = totalQ > 0 ? Math.round((finalCorrect / totalQ) * 100) : 0;
@@ -229,10 +239,10 @@ export const GameEngine: React.FC<GameEngineProps> = ({
       });
     },
     [
+      activeQuestions.length,
       isFinished,
       mode,
       onUpdateStudent,
-      questions.length,
       sessionCorrect,
       sessionPoints,
       stage,
@@ -305,7 +315,7 @@ export const GameEngine: React.FC<GameEngineProps> = ({
   };
 
   const handleNext = () => {
-    if (currentIdx + 1 < questions.length) {
+    if (currentIdx + 1 < activeQuestions.length) {
       setCurrentIdx((i) => i + 1);
     } else {
       finishGame(false);
@@ -318,8 +328,30 @@ export const GameEngine: React.FC<GameEngineProps> = ({
     setFeedback(null);
   };
 
+  const handleRetryWrongOnly = () => {
+    if (sessionWrongQuestions.length === 0) return;
+    const wrongList = [...sessionWrongQuestions];
+    setCustomQuestionSubset(wrongList);
+    startedAtRef.current = Date.now();
+    setCurrentIdx(0);
+    setAnswerValue(createInitialAnswer(wrongList[0]));
+    setFeedback(null);
+    setShowHint(false);
+    setSessionPoints(0);
+    setSessionCorrect(0);
+    setSessionAnsweredIds(new Set());
+    setSessionWrongQuestions([]);
+    setStreak(0);
+    setRemainingSeconds(stage.challengeDurationSec);
+    setIsFinished(false);
+    setTimedOut(false);
+    setFinishSummary(null);
+  };
+
   const handleRestartSession = () => {
     startedAtRef.current = Date.now();
+    setCustomQuestionSubset(null);
+    setDifficultyFilter('all');
     setCurrentIdx(0);
     setAnswerValue(questions[0] ? createInitialAnswer(questions[0]) : '');
     setFeedback(null);
@@ -484,6 +516,17 @@ export const GameEngine: React.FC<GameEngineProps> = ({
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          {sessionWrongQuestions.length > 0 && (
+            <button
+              type="button"
+              onClick={handleRetryWrongOnly}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-rose-300 bg-rose-50 text-rose-700 font-bold hover:bg-rose-100 transition-colors shadow-sm"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Luyện tập lại ngay các câu chưa đúng ({sessionWrongQuestions.length} câu)
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleRestartSession}
@@ -551,7 +594,7 @@ export const GameEngine: React.FC<GameEngineProps> = ({
         gameTitle={stage.gameTitle}
         mode={mode}
         currentIndex={currentIdx}
-        totalQuestions={questions.length}
+        totalQuestions={activeQuestions.length}
         sessionPoints={sessionPoints}
         correctCount={sessionCorrect}
         streak={streak}
@@ -562,6 +605,58 @@ export const GameEngine: React.FC<GameEngineProps> = ({
         onTickTimer={setRemainingSeconds}
         onTimeUp={() => finishGame(true)}
       />
+
+      {/* Practice Mode Difficulty Level Filter */}
+      {mode === 'practice' && !customQuestionSubset && (
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-2.5 shadow-sm">
+          <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+            Phân loại mức độ nhận thức:
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {(['all', 'Nhận biết', 'Thông hiểu', 'Vận dụng'] as const).map((lvl) => {
+              const count =
+                lvl === 'all'
+                  ? questions.length
+                  : questions.filter((q) => q.difficulty === lvl).length;
+              if (lvl !== 'all' && count === 0) return null;
+              const active = difficultyFilter === lvl;
+              return (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => {
+                    setDifficultyFilter(lvl);
+                    setCurrentIdx(0);
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                    active
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  {lvl === 'all' ? 'Tất cả mức độ' : lvl} ({count})
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Custom Subset Indication (Retrying Wrong Questions) */}
+      {customQuestionSubset && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-2.5 flex items-center justify-between shadow-sm">
+          <span className="text-xs font-bold text-amber-800">
+            Đang luyện tập lại {customQuestionSubset.length} câu đã làm chưa chính xác để khắc phục lỗi sai
+          </span>
+          <button
+            type="button"
+            onClick={handleRestartSession}
+            className="text-xs font-bold text-amber-900 underline hover:no-underline"
+          >
+            Quay lại toàn bộ câu hỏi
+          </button>
+        </div>
+      )}
 
       {/* Main Question Card */}
       <motion.div

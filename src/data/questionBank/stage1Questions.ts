@@ -36,12 +36,12 @@ export const STAGE1_QUESTIONS: Question[] = [
     stageId: 1,
     questionType: 'fill_blank',
     difficulty: 'Nhận biết',
-    question: 'Cho tam giác ABC có ∠A = 50° và ∠B = 60°. Tính số đo góc C (đơn vị: độ).',
-    correctAnswer: 70,
+    question: 'Cho tam giác ABC có góc A = 50°, góc B = 65°. Tính số đo góc C (đơn vị: độ).',
+    correctAnswer: 65,
     unit: '°',
     explanation:
-      'Áp dụng định lí tổng ba góc trong ΔABC: ∠A + ∠B + ∠C = 180°. Suy ra ∠C = 180° − 50° − 60° = 70°.',
-    hint: 'Lấy 180° trừ đi tổng hai góc đã biết (50° + 60°).',
+      'Áp dụng định lí tổng ba góc trong ΔABC: ∠A + ∠B + ∠C = 180°. Suy ra ∠C = 180° − 50° − 65° = 65°.',
+    hint: 'Lấy 180° trừ đi tổng hai góc đã biết (50° + 65°).',
     keyKnowledge: 'Tổng ba góc trong một tam giác luôn bằng 180°: ∠A + ∠B + ∠C = 180°.',
     diagramData: {
       viewBox: '0 0 360 190',
@@ -58,14 +58,14 @@ export const STAGE1_QUESTIONS: Question[] = [
       ],
       angles: [
         { vertex: 'A', from: 'B', to: 'C', arcs: 1, color: '#2563EB', label: '50°' },
-        { vertex: 'B', from: 'C', to: 'A', arcs: 2, color: '#14B8A6', label: '60°' },
+        { vertex: 'B', from: 'C', to: 'A', arcs: 2, color: '#14B8A6', label: '65°' },
         { vertex: 'C', from: 'A', to: 'B', arcs: 3, color: '#F97316', label: '?' },
       ],
       notToScale: true,
     },
     score: 10,
     knowledgeTag: 'Tổng ba góc trong tam giác',
-    mathCheck: { triangleAngles: [[50, 60, 70]] },
+    mathCheck: { triangleAngles: [[50, 65, 65]] },
   },
   {
     id: 's1_q3',
